@@ -7,23 +7,21 @@ interface JoinRoomDialogProps {
   visible: boolean;
   onHide: () => void;
   onJoinRoom: (pin: string) => void;
-  initialPin?: string;
 }
 
 export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({ 
   visible, 
   onHide, 
-  onJoinRoom,
-  initialPin = ''
+  onJoinRoom
 }) => {
-  const [joinPin, setJoinPin] = useState<string>(initialPin);
+  const [joinPin, setJoinPin] = useState<string>('');
 
   // Reset pin when dialog visibility changes
   React.useEffect(() => {
     if (visible) {
-      setJoinPin(initialPin);
+      setJoinPin(''); // Siempre limpiar el campo al abrir
     }
-  }, [visible, initialPin]);
+  }, [visible]);
 
   const handleJoinRoom = () => {
     onJoinRoom(joinPin);

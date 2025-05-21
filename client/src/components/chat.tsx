@@ -46,7 +46,6 @@ export const Chat: React.FC = () => {
     // Estados para gestión de salas
     const [inRoom, setInRoom] = useState<boolean>(false);
     const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
-    const [joinPin, setJoinPin] = useState<string>('');
     const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
     const [participants, setParticipants] = useState<string[]>([]);
     
@@ -369,8 +368,7 @@ export const Chat: React.FC = () => {
                     availableRooms={availableRooms}
                     onCreateRoom={() => setShowCreateRoomDialog(true)}
                     onJoinRoom={() => setShowJoinRoomDialog(true)}
-                    onSelectRoom={(pin) => {
-                        setJoinPin(pin);
+                    onSelectRoom={() => {
                         setShowJoinRoomDialog(true);
                     }}
                     toast={toast}
@@ -387,7 +385,6 @@ export const Chat: React.FC = () => {
                     visible={showJoinRoomDialog}
                     onHide={() => setShowJoinRoomDialog(false)}
                     onJoinRoom={joinRoom}
-                    initialPin={joinPin}
                 />
             </>
         );
