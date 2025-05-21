@@ -31,6 +31,8 @@ export const WelcomeForm: React.FC<WelcomeFormProps> = ({ onSetNickname }) => {
               onKeyDown={(e) => e.key === 'Enter' && handleSetNick()} // También al pulsar Enter
               placeholder="Tu nickname"
               className="p-mt-2"
+              //maximo caracteres
+              maxLength={30} // Limita a 30 caracteres
             />
           </div>
           <Button

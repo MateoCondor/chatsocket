@@ -27,27 +27,16 @@ const getLocalIP = async (): Promise<string> => {
     try {
       // Crear una conexión RTCPeerConnection
       const pc = new RTCPeerConnection({
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:stun1.l.google.com:19302" }, // Servidores STUN adicionales
-          { urls: "stun:stun2.l.google.com:19302" }
-        ]
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
       });
       
       // Variable para controlar si ya se resolvió
       let ipFound = false;
-      const foundIPs = new Set<string>();
       
       // Cerrar conexión después de cierto tiempo si no encuentra IP
       const timeoutId = setTimeout(() => {
-        pc.close();
-        
-        if (foundIPs.size > 0) {
-          // Usar la primera IP encontrada
-          const firstIP = Array.from(foundIPs)[0];
-          ipFound = true;
-          resolve(firstIP);
-        } else {
+        if (!ipFound) {
+          pc.close();
           reject(new Error("Timeout al obtener IP local"));
         }
       }, 5000);
@@ -64,25 +53,16 @@ const getLocalIP = async (): Promise<string> => {
           
           // Filtrar IPs locales válidas (no 0.0.0.0, 127.0.0.1, etc.)
           if (!ip.startsWith('0.') && !ip.startsWith('127.') && ip !== '0.0.0.0') {
-            console.log("IP candidata encontrada:", ip, "- Tipo:", event.candidate.type);
-            foundIPs.add(ip);
-            
-            // Para redes WiFi, las direcciones 192.168.x.x son comunes
-            // Si encontramos direcciones WiFi, las priorizamos
-            if (ip.startsWith('192.168.') || ip.startsWith('10.')) {
-              clearTimeout(timeoutId);
-              ipFound = true;
-              pc.close();
-              resolve(ip);
-            }
+            clearTimeout(timeoutId);
+            ipFound = true;
+            pc.close();
+            resolve(ip);
           }
         }
       };
       
-      // Forzar la generación de candidatos ICE con múltiples canales de datos
-      // Esto ayuda a descubrir más interfaces de red
-      pc.createDataChannel("wifi_channel");
-      pc.createDataChannel("ethernet_channel");
+      // Crear un canal de datos para forzar la generación de candidatos ICE
+      pc.createDataChannel("");
       
       pc.createOffer()
         .then(offer => pc.setLocalDescription(offer))
