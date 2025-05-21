@@ -21,6 +21,61 @@ import {
     STORAGE_KEYS 
 } from '../types';
 
+// Función para obtener la IP local usando WebRTC
+const getLocalIP = async (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      // Crear una conexión RTCPeerConnection
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+      });
+      
+      // Variable para controlar si ya se resolvió
+      let ipFound = false;
+      
+      // Cerrar conexión después de cierto tiempo si no encuentra IP
+      const timeoutId = setTimeout(() => {
+        if (!ipFound) {
+          pc.close();
+          reject(new Error("Timeout al obtener IP local"));
+        }
+      }, 5000);
+      
+      pc.onicecandidate = (event) => {
+        if (!event.candidate) return;
+        
+        // Buscar direcciones IPv4 en la información del candidato
+        const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+        const match = ipRegex.exec(event.candidate.candidate);
+        
+        if (match && match[1]) {
+          const ip = match[1];
+          
+          // Filtrar IPs locales válidas (no 0.0.0.0, 127.0.0.1, etc.)
+          if (!ip.startsWith('0.') && !ip.startsWith('127.') && ip !== '0.0.0.0') {
+            clearTimeout(timeoutId);
+            ipFound = true;
+            pc.close();
+            resolve(ip);
+          }
+        }
+      };
+      
+      // Crear un canal de datos para forzar la generación de candidatos ICE
+      pc.createDataChannel("");
+      
+      pc.createOffer()
+        .then(offer => pc.setLocalDescription(offer))
+        .catch(error => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // URL de conexión al servidor Socket.IO, definida en .env
 const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL || 'https://chatsocket-7n0w.onrender.com';
 
@@ -36,6 +91,9 @@ export const Chat: React.FC = () => {
 
     // Estado para guardar la información de host/IP recibida
     const [hostInfo, setHostInfo] = useState<HostInfo>({ host: '', ip: '' });
+    
+    // Estado para almacenar la IP local del dispositivo
+    const [localIP, setLocalIP] = useState<string>('');
     
     // Historial de mensajes intercambiados
     const [messages, setMessages] = useState<Message[]>([]);
@@ -87,6 +145,9 @@ export const Chat: React.FC = () => {
         // Debuggear conexión
         socketRef.current.on('connect', () => {
             console.log('Conectado al servidor como:', socketRef.current.id);
+            
+            // Enviar IP local al servidor junto con el ID de cliente
+            socketRef.current.emit('register_device', { nickname, localIP });
             
             // Limpiar cualquier información de sala anterior almacenada
             localStorage.removeItem(STORAGE_KEYS.IN_ROOM);
@@ -226,13 +287,11 @@ export const Chat: React.FC = () => {
                 // Para compatibilidad con versiones anteriores (mensajes sin ID)
                 setMessages(prev => [...prev, msg]);
             }
-        });
-
-        // Limpieza al desmontar el componente o cambiar de nickname
+        });        // Limpieza al desmontar el componente o cambiar de nickname
         return () => {
             socketRef.current.disconnect();
         };
-    }, [nickname]);
+    }, [nickname, localIP]);
 
     // Efecto para solicitar salas disponibles cuando estamos conectados
     useEffect(() => {
@@ -248,14 +307,22 @@ export const Chat: React.FC = () => {
             // Limpiar el intervalo al desmontar o entrar a una sala
             return () => clearInterval(intervalId);
         }
-    }, [connected, inRoom]);
-
-    // Función para establecer el nickname
-    const handleSetNickname = (nick: string) => {
-        setNickname(nick);
-    };
-
-    // Función para crear una nueva sala
+    }, [connected, inRoom]);    // Función para establecer el nickname
+    const handleSetNickname = async (nick: string) => {
+        try {
+            // Intentar obtener la IP local del dispositivo
+            const ip = await getLocalIP();
+            console.log('IP local obtenida:', ip);
+            setLocalIP(ip);
+            // Luego establecer el nickname
+            setNickname(nick);
+        } catch (error) {
+            console.error('Error al obtener IP local:', error);
+            // Si falla, asignar un valor aleatorio para identificar esta sesión
+            setLocalIP(`unknown-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`);
+            setNickname(nick);
+        }
+    };    // Función para crear una nueva sala
     const createRoom = (roomNumber: string, maxParticipants: number) => {
         // Verificar si el usuario ya está en una sala
         const savedInRoom = localStorage.getItem(STORAGE_KEYS.IN_ROOM);
@@ -281,13 +348,13 @@ export const Chat: React.FC = () => {
             socketRef.current.emit('create_room', { 
                 maxParticipants,
                 roomNumber,
-                nickname
+                nickname,
+                localIP  // Enviamos la IP local
             });
             // No cerrar el diálogo aquí, solo si el servidor responde OK
         }
     };
-    
-    // Función para unirse a una sala existente
+      // Función para unirse a una sala existente
     const joinRoom = (pin: string) => {
         // Verificar si el usuario ya está en una sala
         const savedInRoom = localStorage.getItem(STORAGE_KEYS.IN_ROOM);
@@ -302,7 +369,7 @@ export const Chat: React.FC = () => {
         }
 
         if (socketRef.current && connected && pin.length === 6) {
-            socketRef.current.emit('join_room', { pin, nickname });
+            socketRef.current.emit('join_room', { pin, nickname, localIP });
             // No marcar inRoom ni cerrar el diálogo aquí, solo si el servidor responde OK
         } else {
             toast.current?.show({ 

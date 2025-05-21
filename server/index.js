@@ -22,6 +22,9 @@ const rooms = new Map();
 // Set global para nicknames activos (en cualquier sala)
 const activeNicknames = new Set();
 
+// Mapa para almacenar las IPs locales y sus nicknames activos
+const deviceIPs = new Map(); // localIP -> Set de nicknames
+
 // Función para obtener lista de salas disponibles (no llenas)
 function getAvailableRooms() {
   const availableRooms = [];
@@ -48,14 +51,7 @@ function generateUniquePin() {
 }
 
 io.on('connection', (socket) => {
-  const clientIP = socket.handshake.address;
-  console.log(`Usuario conectado: ${socket.id} desde IP: ${clientIP}`);
-
-  socket.on('report_local_ip', (data) => {
-  console.log(`💻 Cliente ${socket.id} reportó IP local: ${data.localIP}`);
-  // Guardar la IP local en el objeto socket para uso posterior
-  socket.localIP = data.localIP;
-});
+  console.log(`Usuario conectado: ${socket.id}`);
   
   // Enviar información del host al cliente cuando se conecta
   const hostInfo = {
@@ -63,6 +59,14 @@ io.on('connection', (socket) => {
     ip: require('os').networkInterfaces().Ethernet?.[0]?.address || '127.0.0.1'
   };
   socket.emit('host_info', hostInfo);
+  
+  // Manejar registro de dispositivo
+  socket.on('register_device', ({ nickname, localIP }) => {
+    console.log(`Dispositivo registrado: ${nickname} desde IP local: ${localIP}`);
+    // Guardar la IP local en el socket para referencia futura
+    socket.localIP = localIP;
+    socket.nickname = nickname; // Guardamos el nickname para usarlo en caso de desconexión
+  });
   
   // Evento para solicitar salas disponibles
   socket.on('get_available_rooms', () => {
@@ -79,14 +83,30 @@ io.on('connection', (socket) => {
       socket.emit('room_participants', participants);
     }
   });
-  
-  // Nueva funcionalidad para crear una sala
-  socket.on('create_room', ({ maxParticipants, roomNumber, nickname }) => {
+    // Nueva funcionalidad para crear una sala
+  socket.on('create_room', ({ maxParticipants, roomNumber, nickname, localIP }) => {
     // Verificar si el nickname ya está en uso globalmente
     if (activeNicknames.has(nickname)) {
       socket.emit('join_error', { message: 'Este usuario ya está en una sala o en uso en otro dispositivo/navegador.' });
       return;
     }
+    
+    // Verificar si esta IP local ya tiene otro nickname activo
+    if (deviceIPs.has(localIP)) {
+      const activeDeviceNicknames = deviceIPs.get(localIP);
+      if (activeDeviceNicknames.size > 0 && !activeDeviceNicknames.has(nickname)) {
+        socket.emit('join_error', { 
+          message: 'Ya tienes una sesión activa en este dispositivo. Ciérrala antes de crear una nueva sala.' 
+        });
+        return;
+      }
+    }
+    
+    // Registrar este nickname con esta IP local
+    if (!deviceIPs.has(localIP)) {
+      deviceIPs.set(localIP, new Set());
+    }
+    deviceIPs.get(localIP).add(nickname);
     
     // Registrar nickname como activo
     activeNicknames.add(nickname);
@@ -101,6 +121,8 @@ io.on('connection', (socket) => {
     
     // Guardar el nickname en el socket
     socket.nickname = nickname;
+    // Guardar la IP local en el socket
+    socket.localIP = localIP;
     
     // Unimos al creador a la sala
     socket.join(pin);
@@ -122,14 +144,30 @@ io.on('connection', (socket) => {
     
     console.log(`Sala #${roomNumber} creada con PIN: ${pin}, límite: ${maxParticipants} usuarios`);
   });
-  
-  // Unirse a una sala existente
-  socket.on('join_room', ({ pin, nickname }) => {
+    // Unirse a una sala existente
+  socket.on('join_room', ({ pin, nickname, localIP }) => {
     // Verificar si el nickname ya está en uso globalmente
     if (activeNicknames.has(nickname)) {
       socket.emit('join_error', { message: 'Este usuario ya está en una sala o en uso en otro dispositivo/navegador.' });
       return;
     }
+    
+    // Verificar si esta IP local ya tiene otro nickname activo
+    if (deviceIPs.has(localIP)) {
+      const activeDeviceNicknames = deviceIPs.get(localIP);
+      if (activeDeviceNicknames.size > 0 && !activeDeviceNicknames.has(nickname)) {
+        socket.emit('join_error', { 
+          message: 'Ya tienes una sesión activa en este dispositivo. Ciérrala antes de unirte a una sala.' 
+        });
+        return;
+      }
+    }
+    
+    // Registrar este nickname con esta IP local
+    if (!deviceIPs.has(localIP)) {
+      deviceIPs.set(localIP, new Set());
+    }
+    deviceIPs.get(localIP).add(nickname);
     
     // Verificar si la sala existe
     if (!rooms.has(pin)) {
@@ -150,6 +188,8 @@ io.on('connection', (socket) => {
     
     // Guardar el nickname en el socket
     socket.nickname = nickname;
+    // Guardar la IP local en el socket
+    socket.localIP = localIP;
     
     // Unir al usuario a la sala
     socket.join(pin);
@@ -201,8 +241,7 @@ io.on('connection', (socket) => {
       io.to(pin).emit('receive_message', msg);
     }
   });
-  
-  // Salir de una sala
+    // Salir de una sala
   socket.on('leave_room', () => {
     leaveCurrentRoom(socket);
     
@@ -210,8 +249,17 @@ io.on('connection', (socket) => {
     if (socket.nickname) {
       activeNicknames.delete(socket.nickname);
     }
+    
+    // Limpiar IP local
+    if (socket.localIP && socket.nickname) {
+      if (deviceIPs.has(socket.localIP)) {
+        deviceIPs.get(socket.localIP).delete(socket.nickname);
+        if (deviceIPs.get(socket.localIP).size === 0) {
+          deviceIPs.delete(socket.localIP);
+        }
+      }
+    }
   });
-
   // Función para manejar la salida de una sala
   function leaveCurrentRoom(socket) {
     const pin = socket.currentRoom;
@@ -259,9 +307,18 @@ io.on('connection', (socket) => {
       if (socket.nickname) {
         activeNicknames.delete(socket.nickname);
       }
+      
+      // Limpiar IP local
+      if (socket.localIP && socket.nickname) {
+        if (deviceIPs.has(socket.localIP)) {
+          deviceIPs.get(socket.localIP).delete(socket.nickname);
+          if (deviceIPs.get(socket.localIP).size === 0) {
+            deviceIPs.delete(socket.localIP);
+          }
+        }
+      }
     }
   }
-
   socket.on('disconnect', () => {
     console.log(`Usuario desconectado: ${socket.id}`);
     leaveCurrentRoom(socket);
@@ -269,6 +326,16 @@ io.on('connection', (socket) => {
     // Liberar nickname globalmente
     if (socket.nickname) {
       activeNicknames.delete(socket.nickname);
+    }
+    
+    // Limpiar IP local
+    if (socket.localIP && socket.nickname) {
+      if (deviceIPs.has(socket.localIP)) {
+        deviceIPs.get(socket.localIP).delete(socket.nickname);
+        if (deviceIPs.get(socket.localIP).size === 0) {
+          deviceIPs.delete(socket.localIP);
+        }
+      }
     }
   });
 });
