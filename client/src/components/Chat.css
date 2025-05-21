@@ -112,6 +112,12 @@
   color: #4f46e5;
 }
 
+/* Mensajes de otros usuarios - autor */
+.message-wrapper.other .message-author {
+  text-align: left;
+  color: #1e293b;
+}
+
 /* Contenido del mensaje */
 .message-content {
   padding: 10px 16px;
