@@ -48,7 +48,8 @@ function generateUniquePin() {
 }
 
 io.on('connection', (socket) => {
-  console.log(`Usuario conectado: ${socket.id}`);
+  const clientIP = socket.handshake.address;
+  console.log(`Usuario conectado: ${socket.id} desde IP: ${clientIP}`);
   
   // Enviar información del host al cliente cuando se conecta
   const hostInfo = {
