@@ -72,50 +72,78 @@
   flex-direction: column;
 }
 
-/* Estilos base para los mensajes */
-.message {
+/* Contenedor para cada mensaje */
+.message-wrapper {
   max-width: 80%;
-  padding: 10px 16px;
-  border-radius: 18px;
-  margin: 4px 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  word-break: break-word;
-  position: relative;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Mensajes enviados por mi */
-.message.me {
+/* Alineación para mis mensajes */
+.message-wrapper.me {
   align-self: flex-end;
+}
+
+/* Alineación para mensajes de otros */
+.message-wrapper.other {
+  align-self: flex-start;
+}
+
+/* Alineación para mensajes del sistema */
+.message-wrapper.system {
+  align-self: center;
+  max-width: 90%;
+}
+
+/* Nombre del autor */
+.message-author {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+  padding: 0 8px;
+  color: #64748b;
+}
+
+/* Mensajes enviados por mi - autor */
+.message-wrapper.me .message-author {
+  text-align: right;
+  color: #4f46e5;
+}
+
+/* Contenido del mensaje */
+.message-content {
+  padding: 10px 16px;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  word-break: break-word;
+  position: relative;
+  text-align: left;
+}
+
+/* Contenido de mis mensajes */
+.message-wrapper.me .message-content {
   background-color: #4f46e5;
   color: white;
   border-bottom-right-radius: 4px;
 }
 
-/* Mensajes enviados por otros */
-.message.other {
-  align-self: flex-start;
+/* Contenido de mensajes de otros */
+.message-wrapper.other .message-content {
   background-color: #e2e8f0;
   color: #1e293b;
   border-bottom-left-radius: 4px;
 }
 
-/* Mensajes del sistema */
-.message.system {
-  align-self: center;
+/* Contenido de mensajes del sistema */
+.message-wrapper.system .message-content {
   background-color: #f3f4f6;
   color: #4b5563;
   border-radius: 12px;
   font-style: italic;
   font-size: 0.9rem;
   padding: 8px 12px;
-  max-width: 90%;
-}
-
-/* Nombre del autor en los mensajes */
-.message strong {
-  font-weight: 600;
-  margin-right: 6px;
 }
 
 /* Área de entrada de texto y botón */
@@ -395,25 +423,19 @@
 }
 
 .elegant-close-icon {
-  font-size: 2rem;
-  font-weight: lighter;
-  color: rgba(255, 255, 255, 0.85);
-  opacity: 0.9;
-  width: 28px;
-  height: 28px;
+  font-size: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  line-height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 100%;
-
-
-  transition: all 0.2s ease;
+  color: #fff;
 }
 
 .elegant-close-icon:hover {
-  color: #fff;
-  opacity: 1;
-  transform: scale(1.15);
+  transform: scale(1.25);
 }
 
 /* Mejoras para el diálogo elegante */
@@ -458,4 +480,30 @@
 .p-inputtext:focus, .p-inputnumber-input:focus {
   border: 1.5px solid #4f46e5;
   background: #fff;
+}
+
+/* Personalización del botón de cierre del Toast */
+.p-toast .p-toast-icon-close {
+  font-size: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-toast .p-toast-icon-close:before {
+  content: "×";
+  font-family: sans-serif;
+}
+
+.p-toast .p-toast-icon-close .pi-times {
+  display: none;
+}
+
+/* Comportamiento al pasar el mouse */
+.p-toast .p-toast-icon-close:hover {
+  transform: scale(1.15);
 }

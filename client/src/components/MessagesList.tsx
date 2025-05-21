@@ -11,15 +11,17 @@ export const MessagesList: React.FC<MessagesListProps> = ({
   messages, 
   currentUser,
   messagesEndRef
-}) => {
-  return (
+}) => {  return (
     <div className="messages-container">
       {messages.map((m, i) => (
         <div
           key={m.id || i}
-          className={`message ${m.author === currentUser ? 'me' : m.author === 'Sistema' ? 'system' : 'other'}`}
+          className={`message-wrapper ${m.author === currentUser ? 'me' : m.author === 'Sistema' ? 'system' : 'other'}`}
         >
-          <strong>{m.author}</strong> {m.content}
+          <div className="message-author">{m.author}</div>
+          <div className="message-content">
+            {m.content}
+          </div>
         </div>
       ))}
       {/* Elemento de referencia para el auto-scroll */}

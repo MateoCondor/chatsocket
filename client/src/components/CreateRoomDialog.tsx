@@ -44,7 +44,9 @@ export const CreateRoomDialog: React.FC<CreateRoomDialogProps> = ({
             id="roomNumber"
             value={roomNumber}
             onChange={(e) => setRoomNumber(e.target.value)}
-            placeholder="Ej: 42"
+            placeholder="Ej: 456"
+            keyfilter="int"
+            maxLength={3}
             className="p-mt-2"
           />
           {error && <small style={{ color: 'red' }}>{error}</small>}
