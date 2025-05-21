@@ -50,6 +50,12 @@ function generateUniquePin() {
 io.on('connection', (socket) => {
   const clientIP = socket.handshake.address;
   console.log(`Usuario conectado: ${socket.id} desde IP: ${clientIP}`);
+
+  socket.on('report_local_ip', (data) => {
+  console.log(`💻 Cliente ${socket.id} reportó IP local: ${data.localIP}`);
+  // Guardar la IP local en el objeto socket para uso posterior
+  socket.localIP = data.localIP;
+});
   
   // Enviar información del host al cliente cuando se conecta
   const hostInfo = {
