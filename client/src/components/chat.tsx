@@ -22,7 +22,7 @@ import {
 } from '../types';
 
 // URL de conexión al servidor Socket.IO, definida en .env
-const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL || 'http://localhost:3001';
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL || 'https://chatsocket-7n0w.onrender.com';
 
 export const Chat: React.FC = () => {
     // Referencia para mostrar mensajes toast
