@@ -369,3 +369,93 @@
   background-color: #dc2626;
   border-color: #dc2626;
 }
+
+/* Mejoras para la X de cierre en los diálogos */
+.custom-dialog .custom-close-icon {
+  font-size: 1.7rem;
+  color: #fff;
+  background: #ef4444;
+  border-radius: 50%;
+  padding: 4px 8px;
+  transition: background 0.2s, color 0.2s;
+  margin-right: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.custom-dialog .custom-close-icon:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Nuevo estilo elegante para la X de cierre */
+.elegant-dialog .p-dialog-header-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elegant-close-icon {
+  font-size: 2rem;
+  font-weight: lighter;
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 0.9;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+
+
+  transition: all 0.2s ease;
+}
+
+.elegant-close-icon:hover {
+  color: #fff;
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+/* Mejoras para el diálogo elegante */
+.elegant-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #5046e5 0%, #3b65da 100%);
+  color: #fff;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 1.25rem;
+}
+
+.elegant-dialog .p-dialog-content {
+  background: #f8fafc;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* Mejoras generales para el diseño */
+.p-card, .p-dialog {
+  box-shadow: 0 8px 32px rgba(80, 80, 160, 0.10) !important;
+}
+
+/* Botones más modernos */
+.p-button {
+  font-size: 1.05rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(80,80,160,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.p-button:active {
+  box-shadow: 0 1px 2px rgba(80,80,160,0.10);
+}
+
+/* Inputs más suaves */
+.p-inputtext, .p-inputnumber-input {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #f3f4f6;
+  transition: border 0.2s;
+}
+.p-inputtext:focus, .p-inputnumber-input:focus {
+  border: 1.5px solid #4f46e5;
+  background: #fff;
+}

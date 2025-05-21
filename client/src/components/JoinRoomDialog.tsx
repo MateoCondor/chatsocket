@@ -33,6 +33,8 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
       visible={visible}
       onHide={onHide}
       style={{ width: '50vw' }}
+      className="elegant-dialog"
+      closeIcon={<span className="elegant-close-icon">×</span>}
     >
       <div className="p-fluid">
         <div className="p-field">
@@ -45,6 +47,7 @@ export const JoinRoomDialog: React.FC<JoinRoomDialogProps> = ({
             maxLength={6}
           />
         </div>
+        <br />
         <Button 
           label="Unirse" 
           icon="pi pi-sign-in" 

@@ -34,6 +34,8 @@ export const CreateRoomDialog: React.FC<CreateRoomDialogProps> = ({
       visible={visible}
       onHide={onHide}
       style={{ width: '50vw' }}
+      className="elegant-dialog"
+      closeIcon={<span className="elegant-close-icon">×</span>}
     >
       <div className="p-fluid">
         <div className="p-field p-mb-3">
@@ -60,6 +62,7 @@ export const CreateRoomDialog: React.FC<CreateRoomDialogProps> = ({
             max={10}
           />
         </div>
+        <br />
         <Button 
           label="Crear sala" 
           icon="pi pi-check" 

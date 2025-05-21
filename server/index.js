@@ -237,7 +237,6 @@ io.on('connection', (socket) => {
       // Si la sala quedó vacía, eliminarla inmediatamente
       if (room.participants.size === 0) {
         rooms.delete(pin);
-        console.log(`Sala ${pin} eliminada inmediatamente por quedar vacía`);
         
         // Notificar a todos sobre la actualización de salas disponibles
         io.emit('available_rooms', getAvailableRooms());
@@ -254,8 +253,6 @@ io.on('connection', (socket) => {
       if (socket.nickname) {
         activeNicknames.delete(socket.nickname);
       }
-      
-      console.log(`Usuario ${socket.nickname} (${socket.id}) abandonó la sala ${pin}`);
     }
   }
 
