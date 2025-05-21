@@ -62,7 +62,6 @@ io.on('connection', (socket) => {
   
   // Manejar registro de dispositivo
   socket.on('register_device', ({ nickname, localIP }) => {
-    console.log(`Dispositivo registrado: ${nickname} desde IP local: ${localIP}`);
     // Guardar la IP local en el socket para referencia futura
     socket.localIP = localIP;
     socket.nickname = nickname; // Guardamos el nickname para usarlo en caso de desconexión
@@ -142,7 +141,7 @@ io.on('connection', (socket) => {
     // Notificar a todos sobre la actualización de salas disponibles
     io.emit('available_rooms', getAvailableRooms());
     
-    console.log(`Sala #${roomNumber} creada con PIN: ${pin}, límite: ${maxParticipants} usuarios`);
+    console.log(`Sala #${roomNumber}, límite: ${maxParticipants} usuarios`);
   });
     // Unirse a una sala existente
   socket.on('join_room', ({ pin, nickname, localIP }) => {
@@ -225,8 +224,6 @@ io.on('connection', (socket) => {
     
     // Notificar a todos sobre la actualización de salas disponibles
     io.emit('available_rooms', getAvailableRooms());
-    
-    console.log(`Usuario ${nickname} (${socket.id}) se unió a la sala ${pin}`);
   });
   
   // Enviar mensaje en una sala específica
