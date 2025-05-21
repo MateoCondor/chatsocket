@@ -17,6 +17,13 @@ interface LobbyProps {
   toast: React.RefObject<Toast | null>;
 }
 
+const handleLogout = () => {
+  // Eliminar registro del usuario activo
+  localStorage.removeItem('active_device_user');
+  // Recarga la página para volver a la pantalla de inicio
+  window.location.reload();
+};
+
 export const Lobby: React.FC<LobbyProps> = ({ 
   nickname, 
   hostInfo, 
@@ -49,7 +56,7 @@ export const Lobby: React.FC<LobbyProps> = ({
             label="Cerrar sesión"
             icon="pi pi-sign-out"
             className="p-button-danger"
-            onClick={() => window.location.reload()}
+            onClick={handleLogout}
           />
         </div>
         
