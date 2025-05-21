@@ -5,6 +5,7 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 15px; /* Añadir padding lateral para dispositivos móviles */
 }
 
 /* Tarjeta principal del chat */
@@ -74,7 +75,7 @@
 
 /* Contenedor para cada mensaje */
 .message-wrapper {
-  max-width: 80%;
+  max-width: 85%; /* Aumentar el ancho máximo para móviles */
   margin: 8px 0;
   display: flex;
   flex-direction: column;
@@ -94,7 +95,7 @@
 /* Alineación para mensajes del sistema */
 .message-wrapper.system {
   align-self: center;
-  max-width: 90%;
+  max-width: 95%; /* Aumentar el ancho máximo para móviles */
 }
 
 /* Nombre del autor */
@@ -177,6 +178,7 @@
   border-radius: 50%;
   width: 48px;
   height: 48px;
+  min-width: 48px; /* Evitar que se encoja en móviles */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,8 +202,10 @@
 /* Pantalla de bienvenida */
 .welcome-card {
   max-width: 500px;
+  width: 100%; /* Asegurar que usa el 100% del ancho disponible */
   margin: 0 auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 0 15px; /* Añadir padding en móviles */
 }
 
 .welcome-card .p-card-title {
@@ -220,8 +224,10 @@
 /* Estilos para la pantalla de salas */
 .rooms-card {
   max-width: 600px;
+  width: 100%; /* Asegurar que usa el 100% del ancho disponible */
   margin: 0 auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 0 15px; /* Añadir padding en móviles */
 }
 
 .room-options {
@@ -229,6 +235,7 @@
   gap: 16px;
   margin-bottom: 24px;
   justify-content: center;
+  flex-wrap: wrap; /* Permitir que los botones se envuelvan en pantallas pequeñas */
 }
 
 /* Información de la sala actual */
@@ -240,11 +247,14 @@
   padding: 10px 16px;
   border-bottom: 1px solid #dce7f1;
   font-size: 0.9rem;
+  flex-wrap: wrap; /* Permitir wrap en pantallas pequeñas */
+  gap: 8px;
 }
 
 .room-details {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap; /* Permitir wrap en pantallas pequeñas */
 }
 
 .room-pin-display,
@@ -288,7 +298,7 @@
 
 .rooms-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Reducir tamaño mínimo de columnas */
   gap: 16px;
 }
 
@@ -337,6 +347,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   width: 250px;
+  max-width: 90%; /* Limitar ancho en móviles */
   z-index: 10;
   overflow: hidden;
 }
@@ -512,4 +523,85 @@
 /* Comportamiento al pasar el mouse */
 .p-toast .p-toast-icon-close:hover {
   transform: scale(1.15);
+}
+
+/* MEDIA QUERIES PARA RESPONSIVE */
+@media screen and (max-width: 768px) {
+  .app {
+    padding: 0 10px;
+  }
+  
+  .chat-container {
+    height: 90vh; /* Más altura en móviles */
+  }
+  
+  .p-card .p-card-title {
+    font-size: 1.2rem;
+    padding: 12px;
+  }
+  
+  .message-wrapper {
+    max-width: 90%;
+  }
+  
+  .input-area {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .input-area .p-button {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+  
+  .room-options {
+    gap: 10px;
+  }
+  
+  .room-details {
+    gap: 12px;
+  }
+  
+  .rooms-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .app {
+    padding: 0 5px;
+  }
+  
+  .message-wrapper {
+    max-width: 95%;
+  }
+  
+  .message-content {
+    padding: 8px 12px;
+  }
+  
+  .p-card .p-card-title {
+    font-size: 1.1rem;
+    padding: 10px;
+  }
+  
+  .input-area .p-button {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+  
+  .room-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .rooms-list {
+    grid-template-columns: 1fr; /* Una sola columna en móviles muy pequeños */
+  }
+  
+  .participants-list {
+    width: 200px;
+  }
 }
