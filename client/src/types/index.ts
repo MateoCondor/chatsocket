@@ -32,6 +32,5 @@ export interface AvailableRoom {
 // Claves para almacenamiento local
 export const STORAGE_KEYS = {
   ROOM_INFO: 'chat_room_info',
-  IN_ROOM: 'chat_in_room',
-  ACTIVE_USER: 'active_device_user'  // Añadir esta nueva clave
+  IN_ROOM: 'chat_in_room'
 };

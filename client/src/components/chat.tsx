@@ -75,15 +75,7 @@ export const Chat: React.FC = () => {
         } catch (error) {
             console.error('Error al guardar estado en localStorage:', error);
         }
-    }, [inRoom, roomInfo]);    // Efecto para limpiar localStorage cuando se desmonta el componente
-    useEffect(() => {
-        return () => {
-            // Esto se ejecuta al desmontar el componente
-            localStorage.removeItem(STORAGE_KEYS.ACTIVE_USER);
-        };
-    }, []);
-
-    // Efecto que inicializa la conexión al servidor
+    }, [inRoom, roomInfo]);    // Efecto que inicializa la conexión al servidor
     useEffect(() => {
         // Si no hay nickname, no conectamos el socket
         if (!nickname) return;
@@ -320,7 +312,8 @@ export const Chat: React.FC = () => {
             });
         }
     };
-      // Función para abandonar la sala actual
+    
+    // Función para abandonar la sala actual
     const leaveRoom = () => {
         if (socketRef.current && inRoom) {
             socketRef.current.emit('leave_room');
@@ -331,8 +324,6 @@ export const Chat: React.FC = () => {
             // Limpiar localStorage cuando el usuario abandona la sala
             localStorage.removeItem(STORAGE_KEYS.IN_ROOM);
             localStorage.removeItem(STORAGE_KEYS.ROOM_INFO);
-            
-            // No eliminamos 'active_device_user' aquí porque el usuario sigue en el lobby
         }
     };
 
