@@ -53,14 +53,16 @@ export const CreateRoomDialog: React.FC<CreateRoomDialogProps> = ({
           </small>
         </div>
         <div className="p-field p-mt-3">
-          <label htmlFor="maxParticipants">Límite de participantes:</label>
-          <InputNumber
+          <label htmlFor="maxParticipants">Límite de participantes:</label>          <InputNumber
             id="maxParticipants"
             value={maxParticipants}
             onChange={(e) => setMaxParticipants(e.value as number)}
             min={2}
-            max={10}
+            max={30}
           />
+          <small className="p-d-block p-pt-1">
+            Establece el número máximo de participantes en la sala. El mínimo es 2 y el máximo es 30.
+          </small>
         </div>
         <br />
         <Button 

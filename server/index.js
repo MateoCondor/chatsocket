@@ -85,11 +85,10 @@ io.on('connection', (socket) => {
     activeNicknames.add(nickname);
     
     const pin = generateUniquePin();
-    
-    rooms.set(pin, {
+      rooms.set(pin, {
       number: roomNumber || 'Sin número',  // Número de sala personalizado
       participants: new Map(), // Cambio a Map para almacenar id => nickname
-      maxParticipants: maxParticipants || 5, // Valor por defecto: 5
+      maxParticipants: maxParticipants || 3, // Valor por defecto: 3
       messages: []
     });
     
