@@ -141,7 +141,7 @@ io.on('connection', (socket) => {
     // Notificar a todos sobre la actualización de salas disponibles
     io.emit('available_rooms', getAvailableRooms());
     
-    console.log(`Sala #${roomNumber}, límite: ${maxParticipants} usuarios`);
+    console.log(`Sala #${roomNumber} creada, límite: ${maxParticipants} usuarios`);
   });
     // Unirse a una sala existente
   socket.on('join_room', ({ pin, nickname, localIP }) => {
